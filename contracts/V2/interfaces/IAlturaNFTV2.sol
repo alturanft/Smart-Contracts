@@ -36,6 +36,14 @@ interface IAlturaNFTV2 {
         bytes calldata data
     ) external;
 
+    function safeBatchTransferFrom(
+        address from,
+        address to,
+        uint256[] calldata ids,
+        uint256[] calldata amounts,
+        bytes calldata data
+    ) external;
+
     function mint(
         address to,
         uint256 id,

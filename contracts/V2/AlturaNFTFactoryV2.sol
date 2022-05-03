@@ -373,16 +373,13 @@ contract AlturaNFTFactoryV2 is
     }
 
     function makeOffer(
-        uint256 _item_id,
+        address _collection,
+        uint256 _token_id,
         uint256 _amount,
         address _currency,
         uint256 _price,
         uint256 _expire
     ) external {
-        Item memory item = items[_item_id];
-        require(item.bValid, "invalid Item id");
-        require(item.owner != msg.sender, "owner can't make offer");
-        require(item.balance >= _amount, "insufficient NFT balance");
         require(_price > 0, "invalid price");
         require(_expire > block.timestamp, "invalid expire");
         require(_currency != address(0x0), "not allow native asset");
@@ -393,9 +390,8 @@ contract AlturaNFTFactoryV2 is
         );
 
         currentOfferId = currentOfferId.add(1);
-        offers[currentOfferId].item_id = item.item_id;
-        offers[currentOfferId].collection = item.collection;
-        offers[currentOfferId].token_id = item.token_id;
+        offers[currentOfferId].collection = _collection;
+        offers[currentOfferId].token_id = _token_id;
         offers[currentOfferId].owner = msg.sender;
         offers[currentOfferId].amount = _amount;
         offers[currentOfferId].currency = _currency;
@@ -404,30 +400,21 @@ contract AlturaNFTFactoryV2 is
         offers[currentOfferId].expire = _expire;
         offers[currentOfferId].bValid = true;
 
-        _offersByItem[item.item_id].push(currentOfferId);
-
-        emit OfferCreated(
-            currentOfferId,
-            item.item_id,
-            item.collection,
-            item.token_id,
-            _amount,
-            _price,
-            _currency,
-            _expire,
-            msg.sender
-        );
+        emit OfferCreated(currentOfferId, 0, _collection, _token_id, _amount, _price, _currency, _expire, msg.sender);
     }
 
-    function acceptOffer(uint256 _id, uint256 _amount) external payable nonReentrant {
-        Offer memory offer = offers[_id];
+    function acceptOffer(
+        uint256 _offerId,
+        uint256 _itemId,
+        uint256 _amount
+    ) external payable nonReentrant {
+        Offer memory offer = offers[_offerId];
         require(offer.bValid, "invalid Offer id");
         require(offer.owner != msg.sender, "offer owner can't accept offer");
         require(offer.expire > block.timestamp, "offer expired");
         require(offer.amount.sub(offer.matched) >= _amount, "insufficient offer amount");
 
-        uint256 item_id = offer.item_id;
-        Item memory item = items[item_id];
+        Item memory item = items[_itemId];
         require(item.bValid, "invalid Item id");
         require(item.owner == msg.sender, "item owner can accept offer");
         require(item.balance >= _amount, "insufficient NFT balance");
@@ -479,18 +466,26 @@ contract AlturaNFTFactoryV2 is
             "buy from Altura"
         );
 
-        items[item_id].balance = items[item_id].balance.sub(_amount);
-        items[item_id].totalSold = items[item_id].totalSold.add(_amount);
+        items[_itemId].balance = items[_itemId].balance.sub(_amount);
+        items[_itemId].totalSold = items[_itemId].totalSold.add(_amount);
 
-        offers[_id].matched = offers[_id].matched.add(_amount);
-        offers[_id].bValid = offers[_id].matched < offers[_id].amount;
+        offers[_offerId].matched = offers[_offerId].matched.add(_amount);
+        offers[_offerId].bValid = offers[_offerId].matched < offers[_offerId].amount;
 
         totalSold = totalSold.add(_amount);
         totalEarning = totalEarning.add(plutusAmount);
         totalSwapped = totalSwapped.add(1);
 
-        emit Swapped(offer.owner, item.owner, item_id, offer.collection, offer.token_id, _amount);
-        emit OfferMatched(_id, _amount, offer.price, offer.currency, offers[_id].matched, offer.owner, item.owner);
+        emit Swapped(offer.owner, item.owner, _itemId, offer.collection, offer.token_id, _amount);
+        emit OfferMatched(
+            _offerId,
+            _amount,
+            offer.price,
+            offer.currency,
+            offers[_offerId].matched,
+            offer.owner,
+            item.owner
+        );
     }
 
     function cancelOffer(uint256 _id, uint256 _amount) external {
