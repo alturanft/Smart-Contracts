@@ -403,28 +403,22 @@ contract AlturaNFTFactoryV2 is
         emit OfferCreated(currentOfferId, 0, _collection, _token_id, _amount, _price, _currency, _expire, msg.sender);
     }
 
-    function acceptOffer(
-        uint256 _offerId,
-        uint256 _itemId,
-        uint256 _amount
-    ) external payable nonReentrant {
+    function acceptOffer(uint256 _offerId, uint256 _amount) external {
         Offer memory offer = offers[_offerId];
         require(offer.bValid, "invalid Offer id");
         require(offer.owner != msg.sender, "offer owner can't accept offer");
         require(offer.expire > block.timestamp, "offer expired");
         require(offer.amount.sub(offer.matched) >= _amount, "insufficient offer amount");
 
-        Item memory item = items[_itemId];
-        require(item.bValid, "invalid Item id");
-        require(item.owner == msg.sender, "item owner can accept offer");
-        require(item.balance >= _amount, "insufficient NFT balance");
+        uint256 balance = IAlturaNFTV2(offer.collection).balanceOf(msg.sender, offer.token_id);
+        require(balance >= _amount, "insufficient NFT balance");
 
         uint256 swapFee = swapFees[offer.currency];
         if (swapFee == 0x0) {
             swapFee = DEFAULT_FEE_PERCENT;
         }
         uint256 plutusAmount = offer.price.mul(_amount);
-        uint256 ownerPercent = PERCENTS_DIVIDER.sub(swapFee).sub(item.royalty);
+        uint256 royalty = IAlturaNFTV2(offer.collection).royaltyOf(offer.token_id);
 
         if (swapFee > 0) {
             require(
@@ -437,12 +431,12 @@ contract AlturaNFTFactoryV2 is
             );
         }
         // transfer Plutus token to creator
-        if (item.royalty > 0) {
+        if (royalty > 0) {
             require(
                 IERC20(offer.currency).transferFrom(
                     offer.owner,
-                    item.creator,
-                    plutusAmount.mul(item.royalty).div(PERCENTS_DIVIDER)
+                    IAlturaNFTV2(offer.collection).creatorOf(offer.token_id),
+                    plutusAmount.mul(royalty).div(PERCENTS_DIVIDER)
                 ),
                 "failed to transfer creator fee"
             );
@@ -451,23 +445,20 @@ contract AlturaNFTFactoryV2 is
         require(
             IERC20(offer.currency).transferFrom(
                 offer.owner,
-                item.owner,
-                plutusAmount.mul(ownerPercent).div(PERCENTS_DIVIDER)
+                msg.sender,
+                plutusAmount.mul(PERCENTS_DIVIDER.sub(swapFee).sub(royalty)).div(PERCENTS_DIVIDER)
             ),
             "failed to transfer to owner"
         );
 
         // transfer NFT token to buyer
         IAlturaNFTV2(offer.collection).safeTransferFrom(
-            address(this),
+            msg.sender,
             offer.owner,
             offer.token_id,
             _amount,
             "buy from Altura"
         );
-
-        items[_itemId].balance = items[_itemId].balance.sub(_amount);
-        items[_itemId].totalSold = items[_itemId].totalSold.add(_amount);
 
         offers[_offerId].matched = offers[_offerId].matched.add(_amount);
         offers[_offerId].bValid = offers[_offerId].matched < offers[_offerId].amount;
@@ -476,7 +467,6 @@ contract AlturaNFTFactoryV2 is
         totalEarning = totalEarning.add(plutusAmount);
         totalSwapped = totalSwapped.add(1);
 
-        emit Swapped(offer.owner, item.owner, _itemId, offer.collection, offer.token_id, _amount);
         emit OfferMatched(
             _offerId,
             _amount,
@@ -484,7 +474,7 @@ contract AlturaNFTFactoryV2 is
             offer.currency,
             offers[_offerId].matched,
             offer.owner,
-            item.owner
+            msg.sender
         );
     }
 

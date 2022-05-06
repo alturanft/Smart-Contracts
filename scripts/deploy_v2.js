@@ -1,3 +1,4 @@
+const { utils, constants } = require("ethers");
 const hre = require("hardhat");
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay * 1000));
@@ -14,11 +15,15 @@ async function main() {
 
     let nftTokenAddress = "0x7051A68dA79da816D4cb99f97BBe36632Ce44d8a";
     let plutusSwapAddress = "0x84dc840240d204CC36ed5be2411BB155BBBaAadC";
+    let plutusLootboxFactory = "";
 
     let deployFlag = {
         deployAluturaNFT: false,
         deployAlturaSwap: false,
-        upgradeAlturaSwap: true,
+        upgradeAlturaSwap: false,
+        deployAlturaLootbox: false,
+        deployAlturaLootboxFactory: true,
+        upgradeAlturaLootboxFactory: false,
     };
 
     /**
@@ -76,6 +81,68 @@ async function main() {
         await upgrades.upgradeProxy(plutusSwapAddress, PlutusSwapV2);
 
         console.log("Altura NFT Swap V2 upgraded");
+    }
+
+    /**
+     *  Deploy Altura Lootbox
+     */
+    if (deployFlag.deployAlturaLootbox) {
+        const AlturaLootboxV2 = await ethers.getContractFactory("AlturaLootboxV2", {
+            signer: signer,
+        });
+
+        const lootboxContract = await AlturaLootboxV2.deploy();
+        await lootboxContract.deployed();
+
+        lootboxContract
+            .attach(lootboxContract.address)
+            .initialize("Altura Lootbox V2", "", constants.AddressZero, constants.AddressZero, 0, 0, signerAddr);
+
+        console.log("Altura Lootbox V2 token deployed to:", lootboxContract.address);
+        const address = lootboxContract.address;
+
+        await sleep(60);
+        await hre.run("verify:verify", {
+            address: address,
+            contract: "contracts/V2/AlturaLootboxV2.sol:AlturaLootboxV2",
+            constructorArguments: [],
+        });
+
+        console.log("Altura Lootbox contract verified");
+    }
+
+    /**
+     *  Deploy AlturaLootbox Factory
+     */
+    if (deployFlag.deployAlturaLootboxFactory) {
+        const PlutusLootbox = await ethers.getContractFactory("AlturaLootboxFactoryV2", {
+            signer: (await ethers.getSigners())[0],
+        });
+
+        const factoryContract = await upgrades.deployProxy(
+            PlutusLootbox,
+            ["0x94ec0Ba4c17C0a658B51ce375F73b1B18d2650cD"],
+            {
+                initializer: "initialize",
+                kind: "uups",
+            },
+        );
+        await factoryContract.deployed();
+
+        console.log("Altura Lootbox factory deployed to:", factoryContract.address);
+    }
+
+    /**
+     *  Upgrade Altura Lootbox factory
+     */
+    if (deployFlag.upgradeAlturaLootboxFactory) {
+        const PlutusLootboxV2 = await ethers.getContractFactory("AlturaLootboxFactoryV2", {
+            signer: (await ethers.getSigners())[0],
+        });
+
+        await upgrades.upgradeProxy(plutusLootboxFactory, PlutusLootboxV2);
+
+        console.log("Altura Lootbox Factory V2 upgraded");
     }
 }
 
