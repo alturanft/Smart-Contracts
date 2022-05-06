@@ -87,6 +87,8 @@ contract AlturaLootboxV2 is ERC1155HolderUpgradeable {
         owner = _owner;
         paymentAddress = _owner;
 
+        shuffleCount = 5;
+
         _salt = uint256(keccak256(abi.encodePacked(_paymentCollection, _paymentTokenId, block.timestamp))).mod(10000);
     }
 
