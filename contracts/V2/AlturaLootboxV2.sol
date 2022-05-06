@@ -58,7 +58,7 @@ contract AlturaLootboxV2 is ERC1155HolderUpgradeable {
     uint256 public cardAmount;
 
     uint256 private _salt;
-    uint256 public shuffleCount = 5;
+    uint256 public shuffleCount = 3;
 
     event AddToken(uint256 tokenId, uint256 amount, uint256 cardAmount);
     event AddTokenBatch(uint256[] tokenIds, uint256[] amounts, uint256 cardAmount);
@@ -87,7 +87,7 @@ contract AlturaLootboxV2 is ERC1155HolderUpgradeable {
         owner = _owner;
         paymentAddress = _owner;
 
-        shuffleCount = 5;
+        shuffleCount = 3;
 
         _salt = uint256(keccak256(abi.encodePacked(_paymentCollection, _paymentTokenId, block.timestamp))).mod(10000);
     }

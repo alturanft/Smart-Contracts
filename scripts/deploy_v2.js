@@ -21,8 +21,8 @@ async function main() {
         deployAluturaNFT: false,
         deployAlturaSwap: false,
         upgradeAlturaSwap: false,
-        deployAlturaLootbox: false,
-        deployAlturaLootboxFactory: true,
+        deployAlturaLootbox: true,
+        deployAlturaLootboxFactory: false,
         upgradeAlturaLootboxFactory: false,
     };
 
