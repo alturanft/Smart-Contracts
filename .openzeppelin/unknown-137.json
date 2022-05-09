@@ -1,0 +1,333 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0x86A862229a105D82dA44C2F278491E19dbB7A1d0",
+      "txHash": "0x9b9f15999a1fbf4840abe8887893f7090709926fd5c01acfde3593c1f62ff5c3",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "e3000c9e9448099bfa7c8be28814e379b4c71bacca586c4d5bf990a0658e78ec": {
+      "address": "0x7efc7B028b58A7a9464407655775B1d380e61A13",
+      "txHash": "0xa5411bafdf5795df60a2fdc64c5f701b20a8270714e9107d793b3efdbbf0be95",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\ERC1967\\ERC1967UpgradeUpgradeable.sol:214"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\UUPSUpgradeable.sol:80"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+          },
+          {
+            "contract": "ERC1155ReceiverUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC1155\\utils\\ERC1155ReceiverUpgradeable.sol:26"
+          },
+          {
+            "contract": "ERC1155HolderUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC1155\\utils\\ERC1155HolderUpgradeable.sol:39"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:21"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:77"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "wethAddress",
+            "type": "t_address",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:37"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "collections",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:54"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "collectionCreators",
+            "type": "t_mapping(t_address,t_address)",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:56"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "items",
+            "type": "t_mapping(t_uint256,t_struct(Item)25134_storage)",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:58"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "currentItemId",
+            "type": "t_uint256",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:59"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "totalSold",
+            "type": "t_uint256",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:61"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "totalSwapped",
+            "type": "t_uint256",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:62"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "swapFees",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:64"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "feeAddress",
+            "type": "t_address",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:65"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "_supportedTokens",
+            "type": "t_struct(AddressSet)10116_storage",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:67"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "targetAddress",
+            "type": "t_address",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:69"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "currentOfferId",
+            "type": "t_uint256",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:83"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "offers",
+            "type": "t_mapping(t_uint256,t_struct(Offer)25184_storage)",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:85"
+          },
+          {
+            "contract": "AlturaNFTFactoryV2",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "contracts\\V2\\AlturaNFTFactoryV2.sol:508"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)"
+          },
+          "t_mapping(t_uint256,t_struct(Item)25134_storage)": {
+            "label": "mapping(uint256 => struct AlturaNFTFactoryV2.Item)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(Item)25134_storage": {
+            "label": "struct AlturaNFTFactoryV2.Item",
+            "members": [
+              {
+                "label": "item_id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "collection",
+                "type": "t_address"
+              },
+              {
+                "label": "token_id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "creator",
+                "type": "t_address"
+              },
+              {
+                "label": "owner",
+                "type": "t_address"
+              },
+              {
+                "label": "balance",
+                "type": "t_uint256"
+              },
+              {
+                "label": "currency",
+                "type": "t_address"
+              },
+              {
+                "label": "price",
+                "type": "t_uint256"
+              },
+              {
+                "label": "royalty",
+                "type": "t_uint256"
+              },
+              {
+                "label": "totalSold",
+                "type": "t_uint256"
+              },
+              {
+                "label": "bValid",
+                "type": "t_bool"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_struct(AddressSet)10116_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)9815_storage"
+              }
+            ]
+          },
+          "t_struct(Set)9815_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_mapping(t_uint256,t_struct(Offer)25184_storage)": {
+            "label": "mapping(uint256 => struct AlturaNFTFactoryV2.Offer)"
+          },
+          "t_struct(Offer)25184_storage": {
+            "label": "struct AlturaNFTFactoryV2.Offer",
+            "members": [
+              {
+                "label": "item_id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "collection",
+                "type": "t_address"
+              },
+              {
+                "label": "token_id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "owner",
+                "type": "t_address"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256"
+              },
+              {
+                "label": "currency",
+                "type": "t_address"
+              },
+              {
+                "label": "price",
+                "type": "t_uint256"
+              },
+              {
+                "label": "matched",
+                "type": "t_uint256"
+              },
+              {
+                "label": "expire",
+                "type": "t_uint256"
+              },
+              {
+                "label": "bValid",
+                "type": "t_bool"
+              }
+            ]
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    }
+  }
+}

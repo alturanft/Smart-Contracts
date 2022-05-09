@@ -21,7 +21,7 @@ interface IWETH {
     function transfer(address to, uint256 value) external returns (bool);
 }
 
-contract AlturaNFTFactoryV2 is
+contract AlturaNFTFactoryV2BNB is
     UUPSUpgradeable,
     ERC1155HolderUpgradeable,
     OwnableUpgradeable,
@@ -34,7 +34,8 @@ contract AlturaNFTFactoryV2 is
     uint256 public constant FEE_MAX_PERCENT = 300;
     uint256 public constant DEFAULT_FEE_PERCENT = 40;
 
-    address public wethAddress;
+    //address public constant wethAddress = 0x094616F0BdFB0b526bD735Bf66Eca0Ad254ca81F; // BSC Testnet
+    address public constant wethAddress = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c; // BSC Mainnet
 
     /* Pairs to swap NFT _id => price */
     struct Item {
@@ -59,6 +60,7 @@ contract AlturaNFTFactoryV2 is
     uint256 public currentItemId;
 
     uint256 public totalSold; /* Total NFT token amount sold */
+    uint256 public totalEarning; /* Total Plutus Token */
     uint256 public totalSwapped; /* Total swap count */
 
     mapping(address => uint256) public swapFees; // swap fees (currency => fee) : percent divider = 1000
@@ -83,6 +85,7 @@ contract AlturaNFTFactoryV2 is
     uint256 public currentOfferId;
     // offer id => offer
     mapping(uint256 => Offer) public offers;
+    mapping(uint256 => uint256[]) private _offersByItem; // item id => offer ids
 
     /** Events */
     event CollectionCreated(address collection_address, address owner, string name, string uri, bool isPublic);
@@ -128,15 +131,14 @@ contract AlturaNFTFactoryV2 is
 
     event OfferCancelled(uint256 id, uint256 amount);
 
-    function initialize(address _fee, address _weth) public initializer {
+    function initialize(address _fee) public initializer {
         __Ownable_init();
         __ERC1155Holder_init();
         __ReentrancyGuard_init();
 
-        wethAddress = _weth;
-
         feeAddress = _fee;
         swapFees[address(0x0)] = 40;
+        swapFees[0x8263CD1601FE73C066bf49cc09841f35348e3be0] = 25; //Alutra Token
 
         createCollection("AlturaNFT", "https://api.alturanft.com/meta/alturanft/", true);
     }
@@ -302,20 +304,20 @@ contract AlturaNFTFactoryV2 is
         if (item.currency == address(0x0)) {
             if (swapFee > 0) {
                 require(
-                    _safeTransferETH(feeAddress, plutusAmount.mul(swapFee).div(PERCENTS_DIVIDER)),
+                    _safeTransferBNB(feeAddress, plutusAmount.mul(swapFee).div(PERCENTS_DIVIDER)),
                     "failed to transfer admin fee"
                 );
             }
             // transfer Plutus token to creator
             if (item.royalty > 0) {
                 require(
-                    _safeTransferETH(item.creator, plutusAmount.mul(item.royalty).div(PERCENTS_DIVIDER)),
+                    _safeTransferBNB(item.creator, plutusAmount.mul(item.royalty).div(PERCENTS_DIVIDER)),
                     "failed to transfer creator fee"
                 );
             }
             // transfer Plutus token to owner
             require(
-                _safeTransferETH(item.owner, plutusAmount.mul(ownerPercent).div(PERCENTS_DIVIDER)),
+                _safeTransferBNB(item.owner, plutusAmount.mul(ownerPercent).div(PERCENTS_DIVIDER)),
                 "failed to transfer to owner"
             );
         } else {
@@ -364,6 +366,7 @@ contract AlturaNFTFactoryV2 is
         items[_id].totalSold = items[_id].totalSold.add(_amount);
 
         totalSold = totalSold.add(_amount);
+        totalEarning = totalEarning.add(plutusAmount);
         totalSwapped = totalSwapped.add(1);
 
         emit Swapped(msg.sender, item.owner, _id, items[_id].collection, items[_id].token_id, _amount);
@@ -461,6 +464,7 @@ contract AlturaNFTFactoryV2 is
         offers[_offerId].bValid = offers[_offerId].matched < offers[_offerId].amount;
 
         totalSold = totalSold.add(_amount);
+        totalEarning = totalEarning.add(plutusAmount);
         totalSwapped = totalSwapped.add(1);
 
         emit OfferMatched(
@@ -489,7 +493,7 @@ contract AlturaNFTFactoryV2 is
         emit OfferCancelled(_id, _amount);
     }
 
-    function _safeTransferETH(address to, uint256 value) internal returns (bool) {
+    function _safeTransferBNB(address to, uint256 value) internal returns (bool) {
         (bool success, ) = to.call{value: value}(new bytes(0));
         if (!success) {
             IWETH(wethAddress).deposit{value: value}();
