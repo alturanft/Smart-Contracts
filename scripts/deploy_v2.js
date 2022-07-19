@@ -13,18 +13,47 @@ async function main() {
     const signerAddr = await signer.getAddress();
     console.log("signer:", signerAddr);
 
-    let nftTokenAddress = "0x7051A68dA79da816D4cb99f97BBe36632Ce44d8a";
-    let plutusSwapAddress = "0x84dc840240d204CC36ed5be2411BB155BBBaAadC";
-    let plutusLootboxFactory = "";
+    let nftTokenAddress = "";
+    let lootboxAddress = "";
+    let alturaSwapAddress = "0xd48EA5fE89402Bc928C6D6c6E380856370Fb42CE";
+    let alturaLootboxFactory = "";
 
     let deployFlag = {
-        deployAluturaNFT: true,
+        deployAluturaNFT: false,
         deployAlturaSwap: false,
         upgradeAlturaSwap: false,
-        deployAlturaLootbox: false,
-        deployAlturaLootboxFactory: false,
+        deployAlturaLootbox: true,
+        deployAlturaLootboxFactory: true,
         upgradeAlturaLootboxFactory: false,
     };
+
+    /**
+     *  Deploy AlturaNFT Swap
+     */
+    if (deployFlag.deployAlturaSwap) {
+        const PlutusSwap = await ethers.getContractFactory("AlturaNFTFactoryV2", {
+            signer: (await ethers.getSigners())[0],
+        });
+
+        const swapContract = await upgrades.deployProxy(
+            PlutusSwap,
+            ["0xAeAF8FcC925d254fC62051a12fF13da1aFfa5Ed4", "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"],
+            {
+                initializer: "initialize",
+                kind: "uups",
+            },
+        );
+        await swapContract.deployed();
+
+        console.log("Altura NFT Swap deployed to:", swapContract.address);
+        alturaSwapAddress = swapContract.address;
+
+        // await hre.run("verify:verify", {
+        //     address: "0x3E1ef6c3817A9ed3d7c04f563144C59146E5BCdf",
+        //     contract: "contracts/V2/AlturaNFTFactoryV2.sol:AlturaNFTFactoryV2",
+        //     constructorArguments: [],
+        // });
+    }
 
     /**
      *  Deploy Altura NFT Token
@@ -36,13 +65,19 @@ async function main() {
 
         const nftContract = await AlturaNFTV2.deploy();
         await nftContract.deployed();
+        console.log("Altura NFT V2 token deployed to:", nftContract.address);
 
-        nftContract
+        await nftContract
             .attach(nftContract.address)
-            .initialize("AlturaNFTV2", "", signerAddr, 0x7efc7b028b58a7a9464407655775b1d380e61a13, true);
+            .initialize("AlturaNFTV2", "", signerAddr, alturaSwapAddress, true);
 
         console.log("Altura NFT V2 token deployed to:", nftContract.address);
         nftTokenAddress = nftContract.address;
+
+        const tx = await (
+            await ethers.getContractAt("AlturaNFTFactoryV2", alturaSwapAddress)
+        ).setTarget(nftTokenAddress);
+        await tx.wait();
 
         await sleep(60);
         await hre.run("verify:verify", {
@@ -55,28 +90,6 @@ async function main() {
     }
 
     /**
-     *  Deploy AlturaNFT Swap
-     */
-    if (deployFlag.deployAlturaSwap) {
-        const PlutusSwap = await ethers.getContractFactory("AlturaNFTFactoryV2", {
-            signer: (await ethers.getSigners())[0],
-        });
-
-        const swapContract = await upgrades.deployProxy(
-            PlutusSwap,
-            ["0xAeAF8FcC925d254fC62051a12fF13da1aFfa5Ed4", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"],
-            {
-                initializer: "initialize",
-                kind: "uups",
-            },
-        );
-        await swapContract.deployed();
-
-        console.log("Altura NFT Swap deployed to:", swapContract.address);
-        plutusSwapAddress = swapContract.address;
-    }
-
-    /**
      *  Upgrade AlturaNFT Swap
      */
     if (deployFlag.upgradeAlturaSwap) {
@@ -84,7 +97,7 @@ async function main() {
             signer: (await ethers.getSigners())[0],
         });
 
-        await upgrades.upgradeProxy(plutusSwapAddress, PlutusSwapV2);
+        await upgrades.upgradeProxy(alturaSwapAddress, PlutusSwapV2);
 
         console.log("Altura NFT Swap V2 upgraded");
     }
@@ -100,16 +113,16 @@ async function main() {
         const lootboxContract = await AlturaLootboxV2.deploy();
         await lootboxContract.deployed();
 
-        lootboxContract
+        await lootboxContract
             .attach(lootboxContract.address)
             .initialize("Altura Lootbox V2", "", constants.AddressZero, constants.AddressZero, 0, 0, signerAddr);
 
         console.log("Altura Lootbox V2 token deployed to:", lootboxContract.address);
-        const address = lootboxContract.address;
+        lootboxAddress = lootboxContract.address;
 
         await sleep(60);
         await hre.run("verify:verify", {
-            address: address,
+            address: lootboxAddress,
             contract: "contracts/V2/AlturaLootboxV2.sol:AlturaLootboxV2",
             constructorArguments: [],
         });
@@ -127,13 +140,19 @@ async function main() {
 
         const factoryContract = await upgrades.deployProxy(
             PlutusLootbox,
-            ["0x94ec0Ba4c17C0a658B51ce375F73b1B18d2650cD"],
+            ["0xAeAF8FcC925d254fC62051a12fF13da1aFfa5Ed4"],
             {
                 initializer: "initialize",
                 kind: "uups",
             },
         );
         await factoryContract.deployed();
+        alturaLootboxFactory = factoryContract.address;
+
+        const tx = await (
+            await ethers.getContractAt("AlturaLootboxFactoryV2", alturaLootboxFactory)
+        ).setTarget(lootboxAddress);
+        await tx.wait();
 
         console.log("Altura Lootbox factory deployed to:", factoryContract.address);
     }
@@ -146,7 +165,7 @@ async function main() {
             signer: (await ethers.getSigners())[0],
         });
 
-        await upgrades.upgradeProxy(plutusLootboxFactory, PlutusLootboxV2);
+        await upgrades.upgradeProxy(alturaLootboxFactory, PlutusLootboxV2);
 
         console.log("Altura Lootbox Factory V2 upgraded");
     }

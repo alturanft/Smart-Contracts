@@ -1,5 +1,5 @@
 {
-    "name": "plutus-contract",
+    "name": "altura-contract",
     "version": "1.0.0",
     "description": "",
     "main": "hardhat.config.js",
@@ -8,9 +8,9 @@
     },
     "scripts": {
         "test": "npm run clean && hardhat test",
-        "build": "npm run clean && hardhat compile --network testnet",
-        "deploy": "hardhat run scripts/deploy.js --network testnet",
-        "deployv2": "hardhat run scripts/deploy_v2.js --network testnet",
+        "build": "npm run clean && hardhat compile",
+        "deploy": "hardhat run scripts/deploy.js",
+        "deployv2": "hardhat run scripts/deploy_v2.js",
         "lint": "prettier-standard --format",
         "clean": "rimraf cache artifacts"
     },
@@ -19,26 +19,26 @@
     "devDependencies": {
         "@eth-optimism/plugins": "0.0.4",
         "@nomiclabs/hardhat-ethers": "^2.0.1",
-        "@nomiclabs/hardhat-etherscan": "^2.1.1",
+        "@nomiclabs/hardhat-etherscan": "^3.0.3",
         "@openzeppelin/hardhat-upgrades": "^1.7.0",
         "dotenv": "8.2.0",
         "ethers": "^5.1.4",
         "hardhat": "^2.9.1",
         "hardhat-contract-sizer": "^2.5.1",
-        "prettier-standard": "16.4.1",
         "prettier": "^2.6.1",
         "prettier-plugin-solidity": "^1.0.0-beta.19",
+        "prettier-standard": "16.4.1",
         "rimraf": "3.0.2"
     },
     "dependencies": {
         "@chainlink/contracts": "^0.1.7",
-        "@openzeppelin/contracts": "^4.1.0",
+        "@openzeppelin/contracts": "4.3.2",
         "@openzeppelin/contracts-ethereum-package": "^3.0.0",
-        "@openzeppelin/contracts-upgradeable": "^4.1.0",
+        "@openzeppelin/contracts-upgradeable": "4.3.2",
+        "chai": "^4.3.0",
         "eslint": "^8.11.0",
         "hardhat-deploy": "^0.11.2",
         "hardhat-gas-reporter": "^1.0.8",
-        "chai": "^4.3.0",
         "web3": "^1.3.4"
     }
 }
